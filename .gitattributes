@@ -1,28 +1,31 @@
-# importing regex and random libraries
 import re
 import random
 
-# potential negative responses
+greetings = ["Hello!", "Hi there!", "Hey!"]
+
+print("Chatbot: Hi! I am a simple chatbot. How can I help you today?")
+
+while True:
+    user_input = input("You: ").lower()
+    if user_input == "hello":
+        print("Chatbot:", random.choice(greetings))
+    elif user_input == "how are you":
+        print("Chatbot: I am just a program, but I'm doing well. Thank you!")
+    elif user_input == "bye":
+        print("Chatbot: Goodbye! Have a great day!")
+        break
+    else:
+        print("Chatbot: Sorry, I don't understand that.")
+
+
 negative_responses = (
-    "no",
-    "nope",
-    "nah",
-    "naw",
-    "not a chance",
-    "sorry"
+    "no", "nope", "nah", "naw", "not a chance", "sorry"
 )
 
-# keywords for exiting the conversation
 exit_commands = (
-    "quit",
-    "pause",
-    "exit",
-    "goodbye",
-    "bye",
-    "later"
+    "quit", "pause", "exit", "goodbye", "bye", "later"
 )
 
-# random starter questions
 random_questions = (
     "Why are you here?",
     "Are there humans like you?",
@@ -31,111 +34,77 @@ random_questions = (
     "Does Earth have a leader?",
     "What planets have you visited?",
     "What technology do you have on this planet?"
-    )
+)
 
-    name=""
-
-    alienbabble = (
-        # Your planet...
-        {r'\s*your planet':
-        ("My planet is a utopia of diverse organisms and species.",
-        "I am from Opidipus, the capital of the Wayward Galaxies")
-        },
-        # why do you...?
-        {r'why/sdo/syou/s(.*[^\?]*)\??':
-        ("What makes you think I am {0}?",
-        "",
-        "")
-        },
-        # why ...?
-        {r'.*why\s+.*':
-        ( ""
-          "")
-        },
-        # what...?
-        {r'.*what\s+.*':
-        ( ""
-        "",
-        "")
-        },
-        # it is...
-        {r'.*it\s+is':
-        ("",
-        "",
-        "")
-        },
-        # I think...
-        {r'.*i\s+think\s(.*)[\?\.!]?':
-        ("",
-        "",)
-        },
-        # Other responses 
-        {r'.*':
-        ("Please tell me more.",
-        "Tell me more!",
+alienbabble = (
+    {r'\s*your planet': (
+        "My planet is a utopia of diverse organisms and species.",
+        "I am from Opidipus, the capital of the Wayward Galaxies."
+    )},
+    {r'.*why\s+.*': (
+        "Why do you ask that?",
+        "What makes you wonder?"
+    )},
+    {r'.*what\s+.*': (
+        "What do you think?",
+        "Why do you ask?"
+    )},
+    {r'.*i\s+think\s(.*)': (
+        "Why do you think {0}?",
+        "What makes you believe {0}?"
+    )},
+    {r'.*': (
+        "Please tell me more.",
         "Why do you say that?",
-        "I see, Can you elaborate on that?",
-        "Interesting, Can you tell me more?",
-        "I see, How do you think?",
-        "Why?",
-        "How do you think I feel about that?")
-        }
-    )
-    # Define greet() below:
+        "Interesting. Can you elaborate?",
+        "How do you think I feel about that?"
+    )}
+)
+
+reflections = {
+    "i'm": "you are",
+    "you're": "i'm",
+    "i": "you",
+    "you": "I",
+    "me": "you",
+    "my": "your",
+    "your": "my"
+}
+
+def reflect(text):
+    words = text.split()
+    return ' '.join(reflections.get(word, word) for word in words)
+
 def greet():
-     name = input("What do they call you?")
-     will_help = input("Hi {}, I'm Marvin! Will you help me?".format(name)).lower()
-     if will_help in the negative_responses:
-            print("Ok have a great Earth day!")
-            return 
-            return True
-    # Define make_exit() here:
+    name = input("What do they call you? ")
+    will_help = input(f"Hi {name}, I'm Marvin! Will you help me? ").lower()
+    if will_help in negative_responses:
+        print("Ok, have a great Earth day!")
+        return False
+    return True
+
 def make_exit(reply):
-    for exit_command in exit_commands:
-        if exit_command.lower() in reply:
-            print("Ok have a great Earth day!") 
+    for command in exit_commands:
+        if command in reply:
+            print("Ok, have a great Earth day!")
             return True
-    # Define alienbot() next:
-def alienbot():
-   if greet():
-     reply = input(random.choice(random_questions)).lower()
-      while not make_exit(reply):
-      reply = converse(reply)
-    # Define converse() below:
+    return False
+
 def converse(reply):
     for pair in alienbabble:
-      for regex_pattern, alien_answers in pair.items():
-      found_match = re.match(regex_pattern, reply)
-        if found_match:
-            alien_answer = random.choice(alien_answers)
-            formatted_alien_answer = alien_answer.format(*[reflect(matching_group) for matching_group in found_match.groups()])
-            reply = input(formatted_alien_answer).lower()
-            return reply
-    # dictionary used to switch pronouns
-    # and verbs in responses
-    reflections = {
-        "i'm": "you are",
-        "you're": "i'm",
-        "was": "were",
-        "i": "you",
-        "are": "am",
-        "am": "are",
-        "i'd": "you would",
-        "i've": "you have",
-        "i'll": "you will",
-        "my": "your",
-        "you've": "i have",
-        "you'll": "i will",
-        "your": "my",
-        "yours": "mine",
-        "you": "I",
-        "me": "you"
-    }
-    def reflect(response):
-    words = response.split()
-    for index, word in enumerate(words):
-        if word in reflections:
-            words[index] = reflections[word]
-    return ' '.join(words)
+        for pattern, responses in pair.items():
+            match = re.match(pattern, reply)
+            if match:
+                response = random.choice(responses)
+                return input(
+                    response.format(*map(reflect, match.groups()))
+                ).lower()
 
-    alienbot()
+def alienbot():
+    if not greet():
+        return
+    reply = input(random.choice(random_questions)).lower()
+    while not make_exit(reply):
+        reply = converse(reply)
+
+alienbot()
