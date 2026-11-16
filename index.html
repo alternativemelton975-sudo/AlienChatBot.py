@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AlienChatBot</title>
     <link rel="stylesheet" href="https://pyscript.net">
     <script type="module" src="https://pyscript.net"></script>
 </head>
 <body>
-    <button id="run-btn" py-click="greet_user">Click Me</button>
+    <input type="number" id="price-input" placeholder="Enter price">
+    <button py-click="run_my_code">Calculate</button>
     <div id="output"></div>
 
-    <!-- 2. Link your Python file and optional config -->
-    <script type="py" src="./app.py" config="./pyscript.json"></script>
+    <script type="py" src="./main.py"></script>
 </body>
 </html>
