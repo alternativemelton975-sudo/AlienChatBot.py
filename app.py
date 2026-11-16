@@ -2,8 +2,23 @@ from pyscript import document, when
 import re
 import random
 
-negative_responses = ("no", "nope", "nah", "naw", "not a chance", "sorry")
-exit_commands = ("quit", "pause", "exit", "goodbye", "bye", "later")
+negative_responses = (
+    "no",
+    "nope",
+    "nah",
+    "naw",
+    "not a chance",
+    "sorry"
+)
+
+exit_commands = (
+    "quit",
+    "pause",
+    "exit",
+    "goodbye",
+    "bye",
+    "later"
+)
 
 random_questions = (
     "Why are you here?",
@@ -16,33 +31,43 @@ random_questions = (
 )
 
 alienbabble = (
-    {r'\s*your planet': (
-        "My planet is a utopia of diverse organisms and species.",
-        "I am from Opidipus, the capital of the Wayward Galaxies."
-    )},
-    {r'.*why\s+.*': (
-        "Why do you ask that?",
-        "What makes you wonder?"
-    )},
-    {r'.*what\s+.*': (
-        "What do you think?",
-        "Why do you ask?"
-    )},
-    {r'.*i\s+think\s(.*)': (
-        "Why do you think {0}?",
-        "What makes you believe {0}?"
-    )},
-    {r'.*': (
-        "Please tell me more.",
-        "Why do you say that?",
-        "Interesting. Can you elaborate?",
-        "How do you think I feel about that?"
-    )}
+    {
+        r".*your planet.*": (
+            "My planet is a utopia of diverse organisms and species.",
+            "I am from Opidipus, the capital of the Wayward Galaxies."
+        )
+    },
+    {
+        r".*why\s+.*": (
+            "Why do you ask that?",
+            "What makes you wonder?"
+        )
+    },
+    {
+        r".*what\s+.*": (
+            "What do you think?",
+            "Why do you ask?"
+        )
+    },
+    {
+        r".*i\s+think\s+(.*)": (
+            "Why do you think {0}?",
+            "What makes you believe {0}?"
+        )
+    },
+    {
+        r".*": (
+            "Please tell me more.",
+            "Why do you say that?",
+            "Interesting. Can you elaborate?",
+            "How do you think I feel about that?"
+        )
+    }
 )
 
 reflections = {
     "i'm": "you are",
-    "you're": "i'm",
+    "you're": "I am",
     "i": "you",
     "you": "I",
     "me": "you",
@@ -50,12 +75,15 @@ reflections = {
     "your": "my"
 }
 
+
 def reflect(text):
     words = text.split()
-    return ' '.join(reflections.get(word, word) for word in words)
+    return " ".join(reflections.get(word, word) for word in words)
+
 
 def make_exit(reply):
     return any(command in reply for command in exit_commands)
+
 
 def get_bot_reply(reply):
     for pair in alienbabble:
@@ -63,22 +91,33 @@ def get_bot_reply(reply):
             match = re.match(pattern, reply)
             if match:
                 response = random.choice(responses)
-                return response.format(*map(reflect, match.groups()))
+
+                if match.groups():
+                    return response.format(
+                        *map(reflect, match.groups())
+                    )
+
+                return response
+
+    return "Interesting. Tell me more."
+
 
 chat_step = "ask_name"
 user_name = ""
 
+
 @when("click", "#send-btn")
 def send_message(event):
     global chat_step, user_name
-    
+
     input_box = document.querySelector("#user-input")
     output_div = document.querySelector("#output")
-    
+
     user_text = input_box.value.strip()
+
     if not user_text:
         return
-        
+
     input_box.value = ""
     reply_lower = user_text.lower()
 
@@ -101,8 +140,10 @@ def send_message(event):
             chat_step = "ended"
         else:
             bot_msg = get_bot_reply(reply_lower)
-            
+
     else:
-        bot_msg = "Marvin has left the chat. Refresh the page to talk again!"
+        bot_msg = (
+            "Marvin has left the chat. Refresh the page to talk again!"
+        )
 
     output_div.innerText = f"Marvin: {bot_msg}"
