@@ -1,1 +1,93 @@
+import re
+import random
 
+negative_responses = (
+    "no", "nope", "nah", "naw", "not a chance", "sorry"
+)
+
+exit_commands = (
+    "quit", "pause", "exit", "goodbye", "bye", "later"
+)
+
+random_questions = (
+    "Why are you here?",
+    "Are there humans like you?",
+    "What do you consume for sustenance?",
+    "Is there life on this planet?",
+    "Does Earth have a leader?",
+    "What planets have you visited?",
+    "What technology do you have on this planet?"
+)
+
+alienbabble = (
+    {r'\s*your planet': (
+        "My planet is a utopia of diverse organisms and species.",
+        "I am from Opidipus, the capital of the Wayward Galaxies."
+    )},
+    {r'.*why\s+.*': (
+        "Why do you ask that?",
+        "What makes you wonder?"
+    )},
+    {r'.*what\s+.*': (
+        "What do you think?",
+        "Why do you ask?"
+    )},
+    {r'.*i\s+think\s(.*)': (
+        "Why do you think {0}?",
+        "What makes you believe {0}?"
+    )},
+    {r'.*': (
+        "Please tell me more.",
+        "Why do you say that?",
+        "Interesting. Can you elaborate?",
+        "How do you think I feel about that?"
+    )}
+)
+
+reflections = {
+    "i'm": "you are",
+    "you're": "i'm",
+    "i": "you",
+    "you": "I",
+    "me": "you",
+    "my": "your",
+    "your": "my"
+}
+
+def reflect(text):
+    words = text.split()
+    return ' '.join(reflections.get(word, word) for word in words)
+
+def greet():
+    name = input("What do they call you? ")
+    will_help = input(f"Hi {name}, I'm Marvin! Will you help me? ").lower()
+    if will_help in negative_responses:
+        print("Ok, have a great Earth day!")
+        return False
+    return True
+
+def make_exit(reply):
+    for command in exit_commands:
+        if command in reply:
+            print("Ok, have a great Earth day!")
+            return True
+    return False
+
+def converse(reply):
+    for pair in alienbabble:
+        for pattern, responses in pair.items():
+            match = re.match(pattern, reply)
+            if match:
+                response = random.choice(responses)
+                return input(
+                    response.format(*map(reflect, match.groups()))
+                ).lower()
+
+def alienbot():
+    if not greet():
+        return
+    reply = input(random.choice(random_questions)).lower()
+    while not make_exit(reply):
+        reply = converse(reply)
+
+alienbot()
