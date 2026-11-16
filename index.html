@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Marvin Chatbot</title>
     <link rel="stylesheet" href="https://pyscript.net">
     <script type="module" src="https://pyscript.net"></script>
 </head>
 <body>
-    <input type="number" id="price-input" placeholder="Enter price">
-    <button py-click="run_my_code">Calculate</button>
-    <div id="output"></div>
+    <div id="output">Marvin: What do they call you?</div>
+    <input type="text" id="user-input" placeholder="Type your reply...">
+    <button py-click="send_message">Send</button>
 
     <script type="py" src="./app.py"></script>
 </body>
