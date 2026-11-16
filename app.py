@@ -1,9 +1,7 @@
-# 1. IMPORTS
-from pyscript import document
+from pyscript import document, when
 import re
 import random
 
-# 2. YOUR CHATBOT DATA & LOGIC
 negative_responses = ("no", "nope", "nah", "naw", "not a chance", "sorry")
 exit_commands = ("quit", "pause", "exit", "goodbye", "bye", "later")
 
@@ -67,11 +65,10 @@ def get_bot_reply(reply):
                 response = random.choice(responses)
                 return response.format(*map(reflect, match.groups()))
 
-# Track where we are in the conversation (replaces the while loop)
 chat_step = "ask_name"
 user_name = ""
 
-# 3. THE BUTTON TRIGGER
+@when("click", "#send-btn")
 def send_message(event):
     global chat_step, user_name
     
@@ -80,18 +77,16 @@ def send_message(event):
     
     user_text = input_box.value.strip()
     if not user_text:
-        return  # Do nothing if input is empty
+        return
         
-    input_box.value = ""  # Clear the input box
+    input_box.value = ""
     reply_lower = user_text.lower()
 
-    # Step 1: User just answered their name
     if chat_step == "ask_name":
         user_name = user_text
         bot_msg = f"Hi {user_name}, I'm Marvin! Will you help me?"
         chat_step = "ask_help"
 
-    # Step 2: User answered whether they will help
     elif chat_step == "ask_help":
         if reply_lower in negative_responses:
             bot_msg = "Ok, have a great Earth day!"
@@ -100,7 +95,6 @@ def send_message(event):
             bot_msg = random.choice(random_questions)
             chat_step = "chatting"
 
-    # Step 3: Main conversation loop
     elif chat_step == "chatting":
         if make_exit(reply_lower):
             bot_msg = "Ok, have a great Earth day!"
@@ -108,9 +102,7 @@ def send_message(event):
         else:
             bot_msg = get_bot_reply(reply_lower)
             
-    # Step 4: Conversation is over
     else:
         bot_msg = "Marvin has left the chat. Refresh the page to talk again!"
 
-    # Display Marvin's response on the webpage
     output_div.innerText = f"Marvin: {bot_msg}"
